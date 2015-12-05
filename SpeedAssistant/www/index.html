@@ -1,0 +1,260 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+
+    <!--
+        Customize the content security policy in the meta tag below as needed. Add 'unsafe-inline' to default-src to enable inline JavaScript.
+        For details, see http://go.microsoft.com/fwlink/?LinkID=617521
+    -->
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">-->
+    <title>SpeedAssistant</title>
+
+    <!--<script src="http://192.168.3.101:8080/target/target-script-min.js#anonymous"></script>-->
+
+    <link href="css/jquery.mobile-1.4.4.min.css" rel="stylesheet" />
+    <script src="scripts/FrameWork/jquery-1.11.1.min.js"></script>
+    <script src="scripts/FrameWork/jquery.mobile-1.4.4.min.js"></script>
+    <!--<script src="scripts/FrameWork/GoogleMap.js"></script>-->
+
+    <!--<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.4/jquery.mobile-1.4.4.min.js"></script>-->
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?v=3&sensor=false&language=en"></script>
+
+    <!-- SpeedAssistant references -->
+    <link href="css/index.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- Start of first page -->
+    <div data-role="page" id="Map">
+
+        <div data-role="header">
+            <h1>Map</h1>
+        </div><!-- /header -->
+
+        <div role="main">
+            <div data-role="collapsible" id="Map_Collapse">
+                <h3>Map</h3>
+                <p><div id="map_canvas" style="height:350px;"></div></p>
+                <button onclick="getcenter()">Center</button>
+            </div>
+            <label for="ShowPureCurrentSpeed">Pure Speed</label>
+            <label id="ShowPureCurrentSpeed"></label>
+            <label for="ShowNeededSpeed">Needed Speed</label>
+            <label id="ShowNeededSpeed"></label>
+            <div data-role="fieldcontain">
+                <table border="1">
+                    <tr>
+                        <td><label>Required Speed:</label></td>
+                        <td><label id="ShowSpeed"></label></td>
+                        <td><label>Distance:</label></td>
+                        <td><label id="distance"></label></td>
+
+                    </tr>
+                    <tr>
+                        <td><label>Current Speed:</label></td>
+                        <td><label id="ShowCurrentSpeed"></label></td>
+                        <td><label>Duration:</label></td>
+                        <td><label id="duration"></label></td>
+                    </tr>
+                    <tr>
+                        <td>Skip Time</td>
+                        <td><div id="timer" style="display:block"><span class="value">0</span>s</div></td>
+                        <td>Remain Time</td>
+                        <td><label id="showtime"></label></td>
+                    </tr>
+                </table>
+                <label for="name">Target Time:</label>
+                <input type="text" name="target_Time" id="target_Time" value="1200" />
+                <label for="name">Target Destination:</label>
+                <input type="text" name="target-dest" id="target-dest" value="" />
+            </div>
+            <a href="#" id="btnGetDirections" data-role="button" data-inline="true" data-mini="true">Get Directions</a>
+            <a href="#" id="btnStartTimer" data-role="button" data-inline="true" data-mini="true" onclick="startWorker()">Start Timer</a>
+            <!--<a href="#" id="html2canvas" data-role="button" data-inline="true" data-mini="true" >html2canvas</a>
+            <a href="#" id="btnscreenshoot" data-role="button" data-inline="true" data-mini="true" onclick="takescreeenshoot()">ScreenShoot</a>
+            <a href="#" id="btnscreenshoot1" data-role="button" data-inline="true" data-mini="true" onclick="saveMapToDataUrl()">saveMapToDataUrl</a>
+            <a href="#" id="btnrasterizeHTML" data-role="button" data-inline="true" data-mini="true" onclick="rasterizeHTML1()">rasterizeHTML</a>
+            <canvas id="FillColor"></canvas>-->
+            <div id="status"></div>
+            <!--<div id="divprintcapture"><img id="CapturedImage"></div>
+            <canvas id="mycanvas" style="width:450px; height:450px;"></canvas>-->
+            <div data-role="collapsible" id="instructions-container">
+                <h3>Instructions</h3>
+                <p><div id="instructions-content"></div></p>
+            </div>
+
+
+            <div data-role="popup" id="myPopup" class="ui-content">
+                <label for="txtCustomName">Location Name</label>
+                <input type='text' id='txtCustomName' />
+                <label for="txtFavoriteTime">Reach Time</label>
+                <input type='time' id='txtFavoriteTime' />
+                <input type='button' id="btnaddFavorite" value='Save Location' />
+            </div>
+
+            <!--<div id="tooltip" style="width:100px; height:100px; position:absolute; z-index:1; background:#fff">Here I am!</div>-->
+        </div><!-- /content -->
+
+        <div data-role="footer">
+            <a href="#Logs">Logs</a>
+            <a href="#Setting">Setting</a>
+            <a href="#FavoriteLocation">FavoriteLocation</a>
+            <a href="#AppLog">AppLog</a>
+
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    <!-- Start of second page -->
+    <div data-role="page" id="Logs">
+
+        <div data-role="header">
+            <h1>Logs</h1>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <table id="UlLogs">
+                <thead>
+                    <tr>
+                        <th>Req Speed:</th>
+                        <th>Cur Speed:</th>
+                        <th>Distance:</th>
+                        <th>Duration:</th>
+                        <th>Skiped T:</th>
+                        <th>Current T:</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed">
+            <a href="#Map">Back to Map</a>
+
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    <!-- Start of second page -->
+    <div data-role="page" id="FavoriteLocation">
+
+        <div data-role="header">
+            <h1>Logs</h1>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+
+            <table id="tblFavLoc">
+                <thead>
+                    <tr>
+                        <th>Custom_Name</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                        <th>X</th>
+                    </tr>
+                </thead>
+            </table>
+
+        </div><!-- /content -->
+
+        <div data-role="footer" data-position="fixed">
+            <a href="#Map">Back to Map</a>
+            <a href="#" data-role="button" onclick="ClearFavorite()">Clear</a>
+
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    <!-- Start of Setting page -->
+    <div data-role="page" id="Setting">
+
+        <div data-role="header">
+            <h1>Setting</h1>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <label>Speak Duration:</label>
+            <input type="text" id="Speak_Duration" value="30000" /> mm
+
+        </div><!-- /content -->
+
+        <div data-role="footer">
+            <a href="#Map">Back to Map</a>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    <!-- Start of AppLog page -->
+    <div data-role="page" id="AppLog">
+
+        <div data-role="header">
+            <h1>AppLog</h1>
+        </div><!-- /header -->
+
+        <div role="main" class="ui-content">
+            <!--<a href="#" class="ui-btn" onclick="javascript:function(){ $('#ulAppLog').empty()}">Clear</a>-->
+            <form class="ui-filterable">
+                <input id="filterBasic-input" data-type="search">
+            </form>
+            <ul id='ulAppLog' data-role="listview" data-filter="true" data-input="#filterBasic-input"></ul>
+        </div><!-- /content -->
+
+        <div data-role="footer">
+            <a href="#Map">Back to Map</a>
+        </div><!-- /footer -->
+    </div><!-- /page -->
+    <!-- Cordova reference, this is added to your app when it's built. -->
+
+    <!-- Cordova reference, this is added to your app when it's built. -->
+    <script src="cordova.js"></script>
+    <script src="scripts/platformOverrides.js"></script>
+
+    <script type="text/javascript" src="scripts/Global_Variable.js"></script>
+    <script type="text/javascript" src="scripts/DB.js"></script>
+    <script src="scripts/Comman.js"></script>
+    <script src="scripts/index.js"></script>
+    <script type="text/javascript" src="scripts/Map.js"></script>
+    <script type="text/javascript" src="scripts/application.js"></script>
+    <!--<script type="text/javascript" src="scripts/FrameWork/html2canvas.js"></script>
+    <script src="scripts/FrameWork/rasterizeHTML.allinone.js"></script>-->
+    <script type="text/javascript">
+        //var canvas = document.querySelector("canvas");
+        //var ctx = canvas.getContext("2d");
+
+        ////ctx.beginPath();
+        ////ctx.arc(75, 75, 50, 0, Math.PI * 2, true); // Outer circle
+        ////ctx.moveTo(110, 75);
+        ////ctx.arc(75, 75, 35, 0, Math.PI, false);   // Mouth (clockwise)
+        ////ctx.moveTo(65, 65);
+        ////ctx.arc(60, 65, 5, 0, Math.PI * 2, true);  // Left eye
+        ////ctx.moveTo(95, 65);
+        ////ctx.arc(90, 65, 5, 0, Math.PI * 2, true);  // Right eye
+        ////ctx.stroke();
+
+        //document.getElementById("html2canvas").addEventListener("click", function () {
+        //    html2canvas(document.body).then(function (canvas) {
+        //        document.body.appendChild(canvas);
+        //    });
+        //}, false);
+
+        //function saveMapToDataUrl() {
+
+        //    var element = $("#map_canvas");
+
+        //    html2canvas(element, {
+        //        useCORS: true,
+        //        logging: true,
+        //        //allowTaint:true,
+        //        onrendered: function (canvas) {
+        //          //  var dataUrl = canvas.toDataURL("image/png");
+
+        //            // DO SOMETHING WITH THE DATAURL
+        //            // Eg. write it to the page
+        //            // $("#divprintcapture").html('<img id="CapturedImage" src="' + dataUrl + '"/>');
+        //            var dataUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        //            $("#CapturedImage").attr('src',dataUrl);
+        //            //document.write('<img src="' + dataUrl + '"/>');
+        //        }
+        //    });
+        //}
+
+
+    </script>
+</body>
+</html>
